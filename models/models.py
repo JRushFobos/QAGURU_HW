@@ -1,4 +1,3 @@
-# Определение модели данных
 from pydantic import BaseModel
 
 

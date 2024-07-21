@@ -7,6 +7,13 @@ valid_schema_one_user = {
         "last_name": {"type": "integer"},
         "avatar": {"type": "integer"},
     },
+    "required": [
+        "id",
+        "email",
+        "first_name",
+        "last_name",
+        "avatar"
+    ]
 }
 
 
