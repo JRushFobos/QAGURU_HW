@@ -16,7 +16,6 @@ valid_schema_one_user = {
     ]
 }
 
-
 valid_schema_all_users = {
     "type": "array",
     "items": {
