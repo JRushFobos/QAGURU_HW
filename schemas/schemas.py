@@ -2,19 +2,20 @@ valid_schema_one_user = {
     "type": "object",
     "properties": {
         "id": {"type": "integer"},
-        "email": {"type": "integer"},
-        "first_name": {"type": "integer"},
-        "last_name": {"type": "integer"},
-        "avatar": {"type": "integer"},
+        "first_name": {"type": "string"},
+        "last_name": {"type": "string"},
+        "email": {"type": "string"},
+        "avatar": {"type": "string"},
     },
     "required": [
         "id",
-        "email",
         "first_name",
         "last_name",
+        "email",
         "avatar"
     ]
 }
+
 
 valid_schema_all_users = {
     "type": "array",
@@ -22,10 +23,11 @@ valid_schema_all_users = {
         "type": "object",
         "properties": {
             "id": {"type": "integer"},
-            "email": {"type": "integer"},
-            "first_name": {"type": "integer"},
-            "last_name": {"type": "integer"},
-            "avatar": {"type": "integer"},
+            "first_name": {"type": "string"},
+            "last_name": {"type": "string"},
+            "email": {"type": "string"},
+            "avatar": {"type": "string"},
         },
-    },
+        "required": ["id", "first_name", "last_name", "email", "avatar"]
+    }
 }

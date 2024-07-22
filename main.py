@@ -1,75 +1,120 @@
-import sqlite3
-from fastapi import FastAPI, HTTPException
-from typing import List
 
-from models.models import UserData
-
+from fastapi import FastAPI, HTTPException, status
+from pydantic import BaseModel
+from typing import List, Optional
+from sqlalchemy import create_engine, Column, Integer, String
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import Session
 
 app = FastAPI()
 
 
-# Создание базы данных и таблицы
-def init_db():
-    conn = sqlite3.connect("users.db")
-    cursor = conn.cursor()
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS users (
-            id INTEGER PRIMARY KEY,
-            email TEXT,
-            first_name TEXT,
-            last_name TEXT,
-            avatar TEXT
-        )
-    ''')
-    conn.commit()
-    conn.close()
+engine = create_engine("sqlite:///./users.db", echo=True)
+
+Base = declarative_base()
+Base.metadata.create_all(bind=engine)
 
 
-# Инициализация базы данных
-init_db()
+class User(Base):
+    __tablename__ = "users"
+    id = Column(Integer, primary_key=True, index=True)
+    first_name = Column(String)
+    last_name = Column(String)
+    email = Column(String, unique=True, index=True)
+    avatar = Column(String)
 
 
-# Метод POST для добавления пользователя
-@app.post("/api/users/", response_model=UserData)
-def create_user(user: UserData):
-    conn = sqlite3.connect("users.db")
-    cursor = conn.cursor()
-    cursor.execute('''
-        INSERT INTO users (email, first_name, last_name, avatar) VALUES (?, ?, ?, ?)
-    ''', (user.email, user.first_name, user.last_name, user.avatar))
-    conn.commit()
-    user.id = cursor.lastrowid  # Получаем ID последней вставленной записи
-    conn.close()
-    return user
+class UserCreate(BaseModel):
+    first_name: str
+    last_name: str
+    email: str
+    avatar: str
 
 
-# Метод GET для получения всех пользователей
-@app.get("/api/users/", response_model=List[UserData])
-def get_users():
-    conn = sqlite3.connect("users.db")
-    cursor = conn.cursor()
-    cursor.execute('SELECT * FROM users')
-    users = cursor.fetchall()
-    conn.close()
-
-    return [UserData(id=row[0], email=row[1], first_name=row[2], last_name=row[3], avatar=row[4]) for row in users]
+class UserResponse(BaseModel):
+    id: int
+    first_name: str
+    last_name: str
+    email: str
+    avatar: str
 
 
-# Метод GET для получения пользователя по ID
-@app.get("/api/users/{user_id}", response_model=UserData)
-def get_user(user_id: int):
-    conn = sqlite3.connect("users.db")
-    cursor = conn.cursor()
-    cursor.execute('SELECT * FROM users WHERE id = ?', (user_id,))
-    user = cursor.fetchone()
-    conn.close()
+class UserUpdate(BaseModel):
+    email: Optional[str] = None
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
+    avatar: Optional[str] = None
 
-    if user is None:
-        raise HTTPException(status_code=404, detail="User not found")
 
-    return UserData(id=user[0], email=user[1], first_name=user[2], last_name=user[3], avatar=user[4])
+@app.post("/api/users/", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
+def create_user(user: UserCreate):
+    with Session(engine) as db:
+        db_user = User(first_name=user.first_name, last_name=user.last_name, email=user.email, avatar=user.avatar)
+        db.add(db_user)
+        db.commit()
+        db.refresh(db_user)
+        return db_user
+
+
+@app.get("/api/users/{user_id}", response_model=UserResponse)
+def read_user(user_id: int):
+    with Session(engine) as db:
+        user = db.query(User).filter(User.id == user_id).first()
+        if user is None:
+            raise HTTPException(status_code=404, detail="User not found")
+        return user
+
+
+@app.delete("/api/users/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_user(user_id: int):
+    with Session(engine) as db:
+        user = db.query(User).filter(User.id == user_id).first()
+        if user is None:
+            raise HTTPException(status_code=404, detail="User not found")
+        db.delete(user)
+        db.commit()
+        return {"message": "User deleted successfully"}
+
+
+@app.get("/api/users/", response_model=List[UserResponse])
+def read_users(skip: int = 0, limit: int = 1000):
+    with Session(engine) as db:
+        users = db.query(User).offset(skip).limit(limit).all()
+        return users
+
+
+@app.patch("/api/users/{user_id}", response_model=UserResponse)
+def update_user(user_id: int, user_update: UserUpdate):
+    with Session(engine) as db:
+        db_user = db.query(User).filter(User.id == user_id).first()
+        if db_user is None:
+            raise HTTPException(status_code=404, detail="User not found")
+
+        for attr, value in user_update.dict(exclude_unset=True).items():
+            setattr(db_user, attr, value)
+
+        db.commit()
+        db.refresh(db_user)
+        return db_user
+
+
+@app.put("/api/users/{user_id}", response_model=UserResponse)
+def update_user_put(user_id: int, user_update: UserCreate):
+    with Session(engine) as db:
+        db_user = db.query(User).filter(User.id == user_id).first()
+        if db_user is None:
+            raise HTTPException(status_code=404, detail="User not found")
+
+        db_user.email = user_update.email
+        db_user.first_name = user_update.first_name
+        db_user.last_name = user_update.last_name
+        db_user.avatar = user_update.avatar
+
+        db.commit()
+        db.refresh(db_user)
+        return db_user
 
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="127.0.0.1", port=8000)
