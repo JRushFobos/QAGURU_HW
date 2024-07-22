@@ -18,6 +18,27 @@
 1. Микросервис: Python + FastAPI
 2. Тесты: Python + Pytest + Requests
 
+## Микросервис примеры запросов
+#### POST запрос /api/users с JSON-body
+```{
+    "first_name": "Rachel",
+    "last_name": "Howell",
+    "email": "rachel.howell@reqres.in",
+    "avatar": "https://reqres.in/img/faces/1-image.jpg"
+}
+```
+#### PUT/PATCH запросы /api/users/{id} с JSON-body
+```{
+    "first_name": "Rachel",
+    "last_name": "Howell",
+    "email": "rachel.howell@reqres.in",
+    "avatar": "https://reqres.in/img/faces/1-image.jpg"
+}
+```
+#### GET запрос /api/users/{id}
+#### GET запрос /api/users/
+#### DELETE запрос /api/users/{id}
+
 ## Запуск проекта (локально)
 1. python -m venv venv
 2. source venv/Scripts/activate
