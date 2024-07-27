@@ -1,5 +1,5 @@
-from pydantic import BaseModel
-from typing import Optional
+from pydantic import BaseModel, EmailStr, HttpUrl
+from typing import List, Optional
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import create_engine, Column, Integer, String
 
@@ -7,7 +7,6 @@ engine = create_engine("sqlite:///./users.db", echo=True)
 
 Base = declarative_base()
 Base.metadata.create_all(bind=engine)
-
 
 
 class User(Base):
@@ -22,16 +21,16 @@ class User(Base):
 class UserCreate(BaseModel):
     first_name: str
     last_name: str
-    email: str
-    avatar: str
+    email: EmailStr
+    avatar: HttpUrl
 
 
 class UserResponse(BaseModel):
     id: int
     first_name: str
     last_name: str
-    email: str
-    avatar: str
+    email: EmailStr
+    avatar: HttpUrl
 
 
 class UserUpdate(BaseModel):
@@ -39,3 +38,11 @@ class UserUpdate(BaseModel):
     first_name: Optional[str] = None
     last_name: Optional[str] = None
     avatar: Optional[str] = None
+
+
+class PaginatedResponse(BaseModel):
+    total: int
+    page: int
+    size: int
+    pages: int
+    items: List[UserResponse]
