@@ -1,6 +1,6 @@
 from faker import Faker
 from sqlalchemy.orm import Session
-from models.models import UserResponse, UserCreate, engine, User, UserUpdate
+from models.models import engine, User
 
 fake = Faker()
 

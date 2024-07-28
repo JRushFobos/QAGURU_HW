@@ -135,19 +135,43 @@ def test_objs_in_resp_pagination(app_url):
     response = requests.get(f"{app_url}/api/users")
     count = len(response.json()["items"])
     random_size = randint(1,count)
-    response = requests.get(f"{app_url}/api/users/?limit={random_limit}")
+    response = requests.get(f"{app_url}/api/users/?size={random_size}")
     assert random_size == len(response.json()["items"]), f"Count obj not the same"
 
 
 # правильное количество страниц при разных значениях size;
 def test_count_pages_by_size_pagination(app_url):
     response = requests.get(f"{app_url}/api/users")
-    count = len(response.json()["items"])
+    pagination_data = response.json()
+    count_users = pagination_data["total"]
+    assert count_users > 0, "BD is empty"
+
+    for size in [1, 5, 10, 25, count_users]:
+        response = requests.get(f"{app_url}/api/users/?size={size}")
+        assert response.status_code == 200, "Error with pagination"
+
+        pagination_data = response.json()
+        expected_pages = (count_users + size - 1) // size
+
+        # Проверяем, что количество страниц соответствует ожиданиям
+        assert pagination_data["pages"] == expected_pages, \
+            f"{expected_pages} pages were expected, but {pagination_data['pages']} as received"
+
+        # Дополнительная проверка: количество элементов на странице не должно превышать size
+        items_count = len(pagination_data["items"])
+        assert items_count <= size, "The number of elements on the page must not exceed the page size"
 
 
 # возвращаются разные данные при разных значениях page;
 def test_resp_by_size_pagination(app_url):
-    pass
+    response = requests.get(f"{app_url}/api/users")
+    count = len(response.json()["items"])
+    random_size = randint(2,count)
+    response = requests.get(f"{app_url}/api/users/?size={random_size}")
+    response_size_1 = response.json()["items"]
+    response = requests.get(f"{app_url}/api/users/?size={random_size-1}")
+    response_size_2 = response.json()["items"]
+    assert (response_size_1 != response_size_2), "Response the same"
 
 
 # Негативные проверки

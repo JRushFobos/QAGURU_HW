@@ -1,9 +1,7 @@
 import dotenv
 from fastapi import FastAPI, HTTPException, status
-from typing import List
 from sqlalchemy.orm import Session
-from fastapi_pagination import Page, add_pagination
-from fastapi_pagination.ext.sqlalchemy import paginate
+from fastapi_pagination import add_pagination
 
 from models.AppStatus import AppStatus
 from models.models import UserResponse, UserCreate, engine, User, UserUpdate, PaginatedResponse
@@ -60,12 +58,11 @@ def delete_user(user_id: int):
 
 
 @app.get("/api/users/", response_model=PaginatedResponse)
-def read_users(skip: int = 0, size: int = 10) -> PaginatedResponse:
+def read_users(page: int = 1, size: int = 10) -> PaginatedResponse:
     with Session(engine) as db:
         total = db.query(User).count()
+        skip = (page - 1) * size
         users = db.query(User).offset(skip).limit(size).all()
-
-        page = skip // size + 1
         pages = (total + size - 1) // size
 
         user_items = [UserResponse(
