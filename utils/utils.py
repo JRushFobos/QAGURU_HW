@@ -1,6 +1,7 @@
 from faker import Faker
 from sqlalchemy.orm import Session
-from models.models import engine, User
+from app.models.models import User
+from app.database.engine import engine
 
 fake = Faker()
 
@@ -17,3 +18,6 @@ def check_and_fill_users():
                 )
                 db.add(db_user)
             db.commit()
+            print("Added 20 users to the database.")
+        else:
+            print("Users already exist in the database.")
