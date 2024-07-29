@@ -1,7 +1,9 @@
+from typing import List
+
 import dotenv
 from fastapi import FastAPI, HTTPException, status
 from sqlalchemy.orm import Session
-from fastapi_pagination import add_pagination
+from fastapi_pagination import add_pagination, Page, paginate
 
 from models.AppStatus import AppStatus
 from models.models import UserResponse, UserCreate, engine, User, UserUpdate, PaginatedResponse
@@ -19,7 +21,7 @@ def startup_event():
 
 @app.get("/status", status_code=status.HTTP_200_OK)
 def status_app() -> AppStatus:
-    return AppStatus(users=True)
+    return AppStatus(database=check_and_fill_users())
 
 
 @app.post("/api/users/", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
@@ -57,29 +59,10 @@ def delete_user(user_id: int):
         return {"message": "User deleted successfully"}
 
 
-@app.get("/api/users/", response_model=PaginatedResponse)
-def read_users(page: int = 1, size: int = 10) -> PaginatedResponse:
+@app.get('/api/users/')
+def get_users() -> Page[UserResponse]:
     with Session(engine) as db:
-        total = db.query(User).count()
-        skip = (page - 1) * size
-        users = db.query(User).offset(skip).limit(size).all()
-        pages = (total + size - 1) // size
-
-        user_items = [UserResponse(
-            id=user.id,
-            first_name=user.first_name,
-            last_name=user.last_name,
-            email=user.email,
-            avatar=str(user.avatar)
-        ) for user in users]
-
-        return PaginatedResponse(
-            total=total,
-            page=page,
-            size=size,
-            pages=pages,
-            items=user_items
-        )
+        return paginate(db.query(User).all())
 
 
 @app.patch("/api/users/{user_id}", response_model=UserResponse)
