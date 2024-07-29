@@ -1,7 +1,7 @@
 from typing import List
 
 import dotenv
-from fastapi import FastAPI, HTTPException, status, Depends
+from fastapi import FastAPI, HTTPException, status
 from sqlalchemy.orm import Session
 from fastapi_pagination import add_pagination, Page, paginate
 
@@ -21,7 +21,7 @@ def startup_event():
 
 @app.get("/status", status_code=status.HTTP_200_OK)
 def status_app() -> AppStatus:
-    return AppStatus(users=True)
+    return AppStatus(database=check_and_fill_users())
 
 
 @app.post("/api/users/", response_model=UserResponse, status_code=status.HTTP_201_CREATED)

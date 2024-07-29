@@ -16,7 +16,7 @@ def app_url():
 
 
 @pytest.fixture(scope="session")
-def check_empty_database(app_url):
+def check_fill_database(app_url):
     response = requests.get(f"{app_url}/api/users")
     count_users = response.json()["total"]
     if count_users == 0:
