@@ -2,6 +2,7 @@ from typing import Optional
 
 from pydantic import BaseModel, EmailStr, HttpUrl
 from sqlmodel import Field, SQLModel
+from typing_extensions import List
 
 
 class User(SQLModel, table=True):
@@ -24,3 +25,11 @@ class UserUpdate(BaseModel):
     first_name: Optional[str] = None
     last_name: Optional[str] = None
     avatar: Optional[HttpUrl] = None
+
+
+class PaginatedResponse(BaseModel):
+    users: List[User]
+    total: int
+    page: int
+    size: int
+    pages: int
