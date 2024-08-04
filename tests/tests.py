@@ -123,9 +123,6 @@ def test_dell_one_user_status(app_url):
     ), f"Status not 204, current status: {response.status_code}"
 
 
-
-
-
 # Негативные проверки
 def test_get_one_user_status_404(app_url):
     response_users = requests.get(url=f"{app_url}/api/users/")
