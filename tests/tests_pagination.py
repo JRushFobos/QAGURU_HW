@@ -4,7 +4,7 @@ from random import randint
 
 from faker import Faker
 
-from models.models import PaginatedResponse
+from app.models.models import PaginatedResponse
 
 fake = Faker()
 
@@ -26,7 +26,7 @@ def test_objs_in_resp_pagination(app_url):
 
 # правильное количество страниц при разных значениях size;
 @pytest.mark.parametrize("size", [1, 5, 10, 25])
-def test_count_pages_by_size_pagination(app_url, size, check_empty_database):
+def test_count_pages_by_size_pagination(app_url, size):
     response = requests.get(f"{app_url}/api/users")
     count_users = response.json()["total"]
     response = requests.get(f"{app_url}/api/users/?size={size}")
