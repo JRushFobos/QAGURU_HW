@@ -30,7 +30,7 @@ def read_user(user_id: int):
     return user
 
 
-@router.delete("/{user_id}", status_code=HTTPStatus.OK)
+@router.delete("/{user_id}", status_code=HTTPStatus.NO_CONTENT)
 def delete_user(user_id: int):
     if user_id < 1:
         raise HTTPException(status_code=HTTPStatus.UNPROCESSABLE_ENTITY, detail="Invalid user id")

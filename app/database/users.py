@@ -46,6 +46,8 @@ def update_user(user_id: int, user: User) -> Type[User]:
 
 def delete_user(user_id: int):
     with Session(engine) as session:
-        user = session.get(User, user_id)
-        session.delete(user)
+        db_user = session.get(User, user_id)
+        if db_user is None:
+            raise HTTPException(status_code=404, detail="User not found")
+        session.delete(db_user)
         session.commit()

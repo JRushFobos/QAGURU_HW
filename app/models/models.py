@@ -17,18 +17,18 @@ class UserCreate(BaseModel):
     email: EmailStr
     first_name: str
     last_name: str
-    avatar: HttpUrl
+    avatar: str
 
 
 class UserUpdate(BaseModel):
     email: Optional[EmailStr] = None
     first_name: Optional[str] = None
     last_name: Optional[str] = None
-    avatar: Optional[HttpUrl] = None
+    avatar: Optional[str] = None
 
 
 class PaginatedResponse(BaseModel):
-    users: List[User]
+    items: List[User]
     total: int
     page: int
     size: int
