@@ -1,15 +1,9 @@
-from typing import Iterable
-
-import dotenv
 from http import HTTPStatus
-from fastapi import FastAPI, HTTPException, status, APIRouter, Depends
-from sqlalchemy.orm import Session
+from fastapi import HTTPException, APIRouter, Depends
 from fastapi_pagination import Page, paginate, Params
 
 from app.database import users
-from app.models.AppStatus import AppStatus
 from app.models.models import UserCreate, User, UserUpdate
-from utils.utils import check_and_fill_users
 
 router = APIRouter(prefix="/api/users")
 
