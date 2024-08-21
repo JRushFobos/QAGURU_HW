@@ -17,9 +17,7 @@ jobs:
           python-version: '3.10'
           cache: 'pip'
       - run: pip install --upgrade -r requirements.txt
-      - run: docker compose down
-      - run: docker volume rm QAGURU_HW_db-data
-      - run: docker compose up -d --build
+      - run: docker compose up -d --build --no-cache
       - run: docker compose logs db
       - run: pytest tests
         env:
