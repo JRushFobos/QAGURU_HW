@@ -130,7 +130,6 @@ logs/
 instantclient_12_2/
 .env-local
 .DS_Store
-docker-compose.yml
 config/local.yml
 
 # Ignore dynaconf secret files

@@ -9,7 +9,7 @@ dnspython==2.6.1
 email_validator==2.2.0
 exceptiongroup==1.2.2
 Faker==26.0.0
-fastapi==0.111.1
+fastapi[standart]==0.111.1
 fastapi-cli==0.0.4
 fastapi-pagination==0.12.26
 greenlet==3.0.3
