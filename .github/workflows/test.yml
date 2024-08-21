@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: example
+      POSTGRES_PASSWORD: example1
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
