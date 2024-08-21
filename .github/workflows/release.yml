@@ -47,7 +47,7 @@ jobs:
       - uses: actions/checkout@v4
       - run: gh release create $(git rev-parse --short HEAD) --generate-notes
         env:
-          GH_TOKEN:${{ github.token }}
+          GH_TOKEN: ${{ github.token }}
 
   deploy:
     runs-on: ubuntu-latest
