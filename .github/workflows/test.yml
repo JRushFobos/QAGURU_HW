@@ -8,9 +8,8 @@ jobs:
     name: Test app
     runs-on: ubuntu-latest
     env:
-      POSTGRES_USER: ci_user
-      POSTGRES_PASSWORD: ci_password
-      POSTGRES_DB: ci_db
+      POSTGRES_USER: ci
+      POSTGRES_PASSWORD: ci
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
